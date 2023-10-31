@@ -2,6 +2,7 @@ package com.example.stb.article;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -22,5 +23,9 @@ public interface ArticleRepository extends JpaRepository<Article, Integer> {
   // 제목에 특정 문자열이 포함되어 있는 데이터 조회
   List<Article> findByTitleLike(String title);
 
+  // 페이징 관련
   Page<Article> findAll(Pageable pageable);
+
+  //  검색 관련
+  Page<Article> findAll(Specification<Article> spec, Pageable pageable);
 }

@@ -2,6 +2,7 @@ package com.example.stb.article;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import com.example.stb.comment.Comment;
 import com.example.stb.member.Member;
@@ -30,14 +31,17 @@ public class Article {
   @Column(columnDefinition = "TEXT")
   private String content;
 
-
   private LocalDateTime createDate;
 
-// private LocalDataTime modifyDate;
+  private LocalDateTime modifyDate;
 
   @OneToMany(mappedBy = "article", cascade = CascadeType.REMOVE)
   private List<Comment> commentList;
 
+  // 여러개의 기사가 한 명의 사용자로부터 작성될 수 있으므로 @ManyToOne 관계가 성립
   @ManyToOne
   private Member author;
+
+  @ManyToMany
+  Set<Member> voter;
 }

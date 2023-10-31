@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.security.Principal;
+
 @RequiredArgsConstructor
 @Controller
 @RequestMapping("/member")
@@ -52,6 +54,7 @@ public class MemberController {
   }
 
   // 실제 로그인을 진행하는 @PostMapping 방식의 메서드는 스프링 시큐리티가 대신 처리하므로 직접 구현할 필요가 없다.
+  // 로그아웃은 스프링 시큐리티 상에서 처리될 뿐더러 별도의 로그아웃 페이지는 없다. 네비게이션바의 UI만 변경.
   @GetMapping("/login")
   public String login() {
     return "login_form";

@@ -43,6 +43,9 @@ dependencies {
 	// 스프링 시큐리티 관련 (스프링부트 프레임워크 + 타임리프 시큐리티 관련)
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.1.RELEASE'
+	// 마크다운 관련 (스프링부트가 내부적으로 관리하지 않는 라이브러리는 버전정보 명시가 필요함)
+	// 스프링부트가 관리하는 라이브러리의 경우 버전 정보를 명시하지 않으면 스프링부트가 가장 궁합이 잘 맞는 버전으로 자동 선택
+	implementation 'org.commonmark:commonmark:0.21.0'
 }
 
 tasks.named('test') {

@@ -6,34 +6,87 @@
 </head>
 <body>
 <div layout:fragment="content" class="container my-3">
-<!-- 질문 -->
+<!-- 기사 -->
     <h2 class="border-bottom py-2" th:text="${article.title}"></h2>
     <div class="card my-3">
         <div class="card-body">
-            <div class="card-text" style="white-space: pre-line;" th:text="${article.content}"></div>
+            <div class="card-text" th:utext="${@commonUtil.markdown(article.content)}"></div>
             <div class="d-flex justify-content-end">
+                <div th:if="${article.modifyDate != null}" class="badge bg-light text-dark p-2 text-start mx-3">
+                    <div class="mb-2">modified at</div>
+                    <div th:text="${#temporals.format(article.modifyDate, 'yyyy-MM-dd HH:mm')}"></div>
+                </div>
                 <div class="badge bg-light text-dark p-2 text-start">
+                    <div class="mb-2">
+                        <span th:if="${article.author != null}" th:text="${article.author.username}"></span>
+                    </div>
                     <div th:text="${#temporals.format(article.createDate, 'yyyy-MM-dd HH:mm')}"></div>
                 </div>
+            </div>
+            <!-- #authentication.getPrincipal()은 Principal 객체를 리턴하는 타임리프의 유틸리티이다 -->
+            <div class="my-3">
+                <a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"
+                   th:data-uri="@{|/article/vote/${article.id}|}">
+                    추천
+                    <span class="badge rounded-pill bg-success" th:text="${#lists.size(article.voter)}"></span>
+                </a>
+                <a th:href="@{|/article/modify/${article.id}|}" class="btn btn-sm btn-outline-secondary"
+                   sec:authorize="isAuthenticated()"
+                   th:if="${article.author != null and #authentication.getPrincipal().getUsername() == article.author.username}"
+                   th:text="수정"></a>
+            <!-- <삭제>는 href 속성값을 javascript:void(0)로 설정했다. 그리고 삭제를 실행할 URL을 얻기 위해 th:data-uri 속성을 추가하고,
+             <삭제> 버튼이 눌리는 이벤트를 확인할 수 있도록 class 속성에 "delete" 항목을 추가해 주었다.
+             data-uri 속성은 자바스크립트에서 클릭 이벤트 발생시 this.dataset.uri와 같이 사용하여 그 값을 얻을 수 있다.
+             href에 삭제 URL을 직접 사용하지 않고 이러한 방식을 사용하는 이유는 삭제 버튼을 클릭했을때
+             "정말로 삭제하시겠습니까?" 와 같은 확인 절차가 필요하기 때문이다. -->
+                <a href="javascript:void(0);" th:data-uri="@{|/article/delete/${article.id}|}"
+                   class="delete btn btn-sm btn-outline-secondary" sec:authorize="isAuthenticated()"
+                   th:if="${article.author != null and #authentication.getPrincipal().getUsername() == article.author.username}"
+                   th:text="삭제"></a>
             </div>
         </div>
     </div>
     <!-- 답변의 갯수 표시 -->
     <h5 class="border-bottom my-3 py-2"
         th:text="|${#lists.size(article.commentList)}개의 답변이 있습니다.|"></h5>
-
-<!-- #lists: 이 부분은 Thymeleaf에서 제공하는 표현식 유틸리티 객체입니다.
+<!-- #lists: 윗 부분, 이 부분은 Thymeleaf에서 제공하는 표현식 유틸리티 객체입니다.
 이 객체는 다양한 리스트 및 배열 조작을 제공하며, size() 메서드는 리스트 또는 배열의 크기를 반환합니다. -->
 
     <!-- 답변 반복 시작 -->
     <!-- article 클래스의 답글 배열을 for-each 문으로 반복하여 내용만을 가져와 li 태그로 나열한 것-->
     <div class="card my-3" th:each="comment : ${article.commentList}">
+        <a th:id="|comment_${comment.id}|"></a>
         <div class="card-body">
-            <div class="card-text" style="white-space: pre-line;" th:text="${comment.replyContent}"></div>
+            <div class="card-text" th:utext="${@commonUtil.markdown(comment.replyContent)}"></div>
             <div class="d-flex justify-content-end">
+                <div th:if="${comment.modifyDate != null}" class="badge bg-light text-dark p-2 text-start mx-3">
+                    <div class="mb-2">modified at</div>
+                    <div th:text="${#temporals.format(comment.modifyDate, 'yyyy-MM-dd HH:mm')}"></div>
+                </div>
                 <div class="badge bg-info text-dark p-2 text-start">
+                    <div class="mb-2">
+                        <span th:if="${comment.author != null}" th:text="${comment.author.username}"></span>
+                    </div>
                     <div th:text="${#temporals.format(comment.createDate, 'yyyy-MM-dd HH:mm')}"></div>
                 </div>
+            </div>
+            <div class="my-3">
+                <!-- #lists.size는 Thymeleaf에서 제공하는 유틸리티 객체인 #lists를 사용하여 리스트 또는
+                배열의 크기를 가져오는 Thymeleaf 표현식입니다. 이 표현식은 주어진 리스트 또는 배열의 요소 수를 반환합니다.
+                즉 배열의 크기 자체가 추천의 갯수와 같다. (기존 text-board에서와 똑같은 아이디어) -->
+                <a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"
+                   th:data-uri="@{|/comment/vote/${comment.id}|}">
+                    추천
+                    <span class="badge rounded-pill bg-success" th:text="${#lists.size(comment.voter)}"></span>
+                </a>
+                <a th:href="@{|/comment/modify/${comment.id}|}" class="btn btn-sm btn-outline-secondary"
+                   sec:authorize="isAuthenticated()"
+                   th:if="${comment.author != null and #authentication.getPrincipal().getUsername() == comment.author.username}"
+                   th:text="수정"></a>
+                <a href="javascript:void(0);" th:data-uri="@{|/comment/delete/${comment.id}|}"
+                   class="delete btn btn-sm btn-outline-secondary" sec:authorize="isAuthenticated()"
+                   th:if="${comment.author != null and #authentication.getPrincipal().getUsername() == comment.author.username}"
+                   th:text="삭제"></a>
             </div>
         </div>
     </div>
@@ -41,9 +94,34 @@
     <!-- 답변 작성 -->
     <form th:action="@{|/comment/create/${article.id}|}" th:object="${commentForm}" method="post" class="my-3">
         <div th:replace="~{form_errors :: formErrorsFragment}"></div>
-        <textarea th:field="*{content}" rows="10" class="form-control"></textarea>
+        <textarea sec:authorize="isAnonymous()" disabled th:field="*{content}" class="form-control" rows="10"></textarea>
+        <textarea sec:authorize="isAuthenticated()" th:field="*{content}" class="form-control" rows="10"></textarea>
         <input type="submit" value="답변등록" class="btn btn-primary my-2">
     </form>
 </div>
+
+<!-- delete에 포함된 HTML 요소(element) 목록을 순회하며 각 요소에 주어진 함수를 실행한다. -->
+<script layout:fragment="script" type='text/javascript'>
+    const delete_elements = document.getElementsByClassName("delete");
+    Array.from(delete_elements).forEach(function(element) {
+        element.addEventListener('click', function() {
+            if(confirm("정말로 삭제하시겠습니까?")) {
+                location.href = this.dataset.uri;
+            };
+        });
+    });
+
+    const recommend_elements = document.getElementsByClassName("recommend");
+    Array.from(recommend_elements).forEach(function(element) {
+        element.addEventListener('click', function() {
+            if(confirm("정말로 추천하시겠습니까?")) {
+                location.href = this.dataset.uri;
+            };
+        });
+    });
+</script>
+
+
+
 </body>
 </html>

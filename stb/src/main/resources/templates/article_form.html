@@ -16,7 +16,15 @@
                    이를 통해 사용자 입력을 데이터 모델에 바인딩하고, 데이터 모델의 값을 폼 필드에 렌더링할 수 있습니다.
 3. 유효성 검사 오류 표시: th:object를 사용하여 연결된 데이터 모델의 유효성 검사 오류를 표시할 수 있습니다.
                   유효성 검사 오류 메시지를 폼에 표시하거나 관련된 필드에 연결된 오류 메시지를 처리할 수 있습니다. .-->
-<form th:action="@{/article/create}" th:object="${articleForm}" method="post">
+
+<!-- 폼 태그의 action 속성 없이 폼을 전송(submit)하면 폼의 action은 현재의 URL(브라우저에 표시되는 URL주소)을 기준으로 전송이 된다.
+즉, 질문 등록시에 브라우저에 표시되는 URL은 /article/create이기 때문에 POST로 폼 전송시
+action 속성에 /article/create가 설정이 되고, 질문 수정시에 브라우저에 표시되는 URL은
+/article/modify/2 형태의 URL이기 때문에 POST로 폼 전송시 action 속성에 /question/modify/2 형태의 URL이 설정되는 것-->
+
+<!-- <form th:action="@{/article/create}" th:object="${articleForm}" method="post"> 수정기능 구현없을 때의 형식-->
+<form th:object="${articleForm}" method="post">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
     <!-- 에러가 존재할때 clas="alert alert-danger"를 보여주고, 에러메시지를 띄운다. -->
     <!-- 관련문서 https://www.thymeleaf.org/doc/tutorials/3.1/thymeleafspring.html#field-errors -->
     <div th:replace="~{form_errors :: formErrorsFragment}"></div>
